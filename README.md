@@ -1,0 +1,1 @@
+# Optimizaci-n-Num-rica-en-una-Dimensi-n
