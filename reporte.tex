@@ -1,0 +1,227 @@
+\documentclass[12pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish]{babel}
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{float}
+\usepackage{hyperref}
+\usepackage{geometry}
+\geometry{margin=2.5cm}
+
+\begin{document}
+
+\begin{titlepage}
+    \centering
+    \vspace*{2cm}
+    {\Large Cálculo Aplicado\par}
+    \vspace{2cm}
+    {\LARGE \textbf{Optimización Numérica en una dimensión}\par}
+    \vspace{2cm}
+    {\large 11 de junio de 2026\par}
+    \vspace{2cm}
+    {\large \textbf{Estudiantes:}\par}
+    \vspace{0.5cm}
+    {\large Mateo Hernández (5.565.681-8)\par}
+    {\large Agustín Pose (5.386.051-8)\par}
+    \vfill
+\end{titlepage}
+
+\newpage
+
+\tableofcontents
+\newpage
+
+\begin{abstract}
+Este informe presenta la implementación y análisis de tres métodos clásicos de optimización numérica en una dimensión: bisección, Newton y descenso por gradiente. Se verifica su funcionamiento en funciones de prueba simples y en un problema de comparación de complejidad computacional. Además, se aplican a problemas de ajuste de datos con tres modelos distintos. Se incluyen extensiones (SGD, learning rate variable, formulación producto) que ilustran técnicas modernas de optimización.
+\end{abstract}
+\newpage
+
+\section{Introducción}
+La optimización numérica es fundamental para resolver problemas donde no existe solución analítica. En una dimensión, permite aproximar puntos de mínimo o máximo de forma iterativa. Este trabajo estudia tres métodos clásicos y sus variantes modernas.
+
+\textbf{Objetivos:}
+\begin{enumerate}
+    \item Implementar bisección, Newton y descenso por gradiente
+    \item Verificar su comportamiento en funciones de prueba
+    \item Analizar la comparación de complejidad: $f(n)=n^2-50n\log_2(n)$
+    \item Resolver problemas de ajuste de datos con tres modelos
+    \item Explorar extensiones: SGD, learning rate variable, formulación producto
+\end{enumerate}
+
+\section{Marco teórico}
+Un punto crítico de $f(x)$ satisface $f'(x)=0$. Su clasificación usa el signo de $f''(x)$.
+
+\textbf{Bisección:} Busca cambio de signo en $f'(x)$ dentro de $[a,b]$ y reduce el intervalo iterativamente.
+
+\textbf{Newton:} Usa la aproximación local $f(x) \approx f(x_n) + f'(x_n)(x-x_n) + \frac{1}{2}f''(x_n)(x-x_n)^2$. Al igualar la derivada a cero:
+$$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
+
+\textbf{Descenso por gradiente:} Actualiza siguiendo $x_{n+1} = x_n - \alpha f'(x_n)$ donde $\alpha$ es el learning rate.
+
+\textbf{SGD:} Versión estocástica del descenso por gradiente, útil en minibatches.
+
+\textbf{Learning rate variable:} Usa schedule $\alpha_n = \alpha_0 \cdot \text{decay}(n)$ para mejorar convergencia.
+
+\textbf{Formulación producto:} Maximiza $P(w) = \prod \exp(-(y_i - \hat{y}_i)^2)$ equivalente a minimizar la suma de cuadrados en el dominio log.
+
+\section{Metodología}
+\subsection{Implementación}
+Se utilizó un framework simbólico que permite:
+\begin{itemize}
+    \item Definir funciones mediante sobrecarga de operadores: $f = x^2 + 2\sin(3x)$
+    \item Calcular derivadas analíticamente: $f' = 2x + 6\cos(3x)$, $f'' = 2 - 18\sin(3x)$
+    \item Evaluar en cualquier punto sin necesidad de derivadas numéricas
+\end{itemize}
+
+\subsection{Estrategia de verificación}
+\begin{enumerate}
+    \item Funciones simples con extremos conocidos: $f(x)=x^2$, $f(x)=(x+1/2)^3-(x+1/2)$, $f(x)=\cos(x)$
+    \item Función computacional: $f(n)=n^2-50n\log_2(n)$ (complejidad de algoritmos)
+    \item Datos sintéticos con tres modelos: lineal $y=2x$, exponencial $y=e^{x/4.5}$, seno $y=\sin(1.5x)$
+\end{enumerate}
+
+\section{Resultados}
+\subsection{Verificación en funciones simples}
+Se probaron los tres métodos en funciones elementales:
+
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+Función & $f(x^*)$ & Bisección & Newton & GD \\
+\midrule
+$x^2$ & $0$ en $x=0$ & \checkmark & \checkmark & \checkmark \\
+$(x+1/2)^3-(x+1/2)$ & $0$ en $x=-1/2$ & \checkmark & \checkmark & \checkmark \\
+$\cos(x)$ & $0$ en $x=\pi/2$ & \checkmark & \checkmark & \checkmark \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Todos los métodos convergieron en funciones bien comportadas. Newton fue el más rápido (típicamente 3-5 iteraciones). 
+
+\textbf{BONUS: Visualización con historial de convergencia}
+
+Se implementaron versiones de los métodos que devuelven la secuencia de aproximaciones durante la optimización. La visualización muestra el camino recorrido por cada algoritmo con código de colores (azul $\to$ primeras iteraciones, amarillo $\to$ últimas). Este análisis permite observar la velocidad de convergencia de cada método y cómo la trayectoria varía según el algoritmo y los parámetros iniciales.
+
+\subsection{Análisis computacional: $f(n)=n^2-50n\log_2(n)$}
+Esta función surge al comparar dos algoritmos con complejidades $T_A(n)=n^2$ y $T_B(n)=50n\log_2(n)$. El objetivo es encontrar el tamaño de entrada donde ambos tienen tiempo comparable.
+
+\textbf{Contexto:} Se busca resolver $f(n)=0$, es decir, encontrar el valor $n$ donde:
+$$n^2 = 50n\log_2(n)$$
+
+\textbf{Comparación de convergencia en intervalo [400, 500]:}
+\begin{center}
+\begin{tabular}{lrrrr}
+\toprule
+Método & $n^*$ & $f(n^*)$ & Iteraciones & Observaciones \\
+\midrule
+Bisección & $438.16$ & $\approx 0$ & 9 & Convergencia estable \\
+Newton & $438.16$ & $\approx 0$ & 2 & Convergencia rápida \\
+GD ($\alpha=0.000005$) & $438.92$ & $\approx 11.83$ & 5 & Convergencia lenta \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Newton es significativamente más rápido. Bisección es robusto pero requiere intervalo con cambio de signo. Descenso por gradiente es el más lento, requiriendo ajuste cuidadoso del learning rate.
+
+\subsection{Ajuste de datos}
+Se ajustaron tres modelos a datos sintéticos:
+
+\subsubsection{Modelo lineal: $\hat{y}=w \cdot x$}
+Datos: 50 puntos de $y = 2x + \epsilon$, $\epsilon \sim N(0, 1)$
+
+\textbf{Resultado óptimo:} $w^* = 1.848$ (comparado con $w_{\text{real}} = 2.0$)
+
+Métodos convergieron al mismo óptimo con diferente número de iteraciones.
+
+\subsubsection{Modelo exponencial: $\hat{y}=e^{w \cdot x}$}
+Datos: 50 puntos de $y = e^{x/4.5} + \epsilon$
+
+\textbf{Resultado óptimo:} $w^* = 0.222$ (aproximadamente $1/4.5 \approx 0.222$)
+
+La función de pérdida es suave y tiene un mínimo único bien definido.
+
+\subsubsection{Modelo seno: $\hat{y}=\sin(w \cdot x)$}
+Datos: 50 puntos de $y = \sin(1.5x) + 0.5\epsilon$
+
+\textbf{Resultado óptimo:} $w^* = 1.502$ (muy cercano a $w_{\text{real}} = 1.5$)
+
+La función de pérdida es no convexa pero presenta mínimos globales claros.
+
+\section{Extensiones (Bonus)}
+\subsection{Descenso por gradiente estocástico (SGD)}
+Se implementó SGD y se comparó con descenso por gradiente clásico. En este problema, ambos convergieron a los mismos óptimos:
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Modelo & SGD & GD clásico \\
+\midrule
+Lineal & $w=1.848$ & $w=1.848$ \\
+Seno & $w=0.690$ & $w=0.690$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+SGD es más útil cuando el costo de evaluar todos los datos es prohibitivo.
+
+\subsection{Learning rate variable}
+Se probaron dos schedules de decaimiento:
+\begin{itemize}
+    \item Exponencial: $\alpha_n = \alpha_0 \exp(-0.1n)$
+    \item Inverso: $\alpha_n = \frac{\alpha_0}{1+0.1n}$
+\end{itemize}
+
+Todos convergieron al mismo punto $x^* \approx -0.471$ con convergencia comparable. El learning rate variable mejora la estabilidad en problemas mal condicionados.
+
+\subsection{Formulación producto}
+Se maximizó $P(w) = \prod \exp(-(y_i-\hat{y}_i)^2)$ equivalente a minimizar la suma de cuadrados.
+
+En el dominio log, Newton converge en 1 iteración, mostrando la estabilidad numérica del log-dominio. Descenso por gradiente en el dominio log requiere learning rate muy pequeño para evitar divergencia.
+
+\textbf{Conclusión sobre formulación producto:}
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Formulación & Método & Convergencia \\
+\midrule
+Suma & Newton & $w=1.848$, 18 iteraciones \\
+Suma & GD & $w=1.848$, 18 iteraciones \\
+Producto (log) & Newton & $w=1.848$, 1 iteración \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\section{Discusión}
+\subsection{Elección de método}
+\begin{itemize}
+    \item \textbf{Bisección:} Cuando se garantiza cambio de signo, muy robusto
+    \item \textbf{Newton:} Cuando hay buena condición inicial y se pueden evaluar segunda derivada
+    \item \textbf{GD:} Cuando el problema es de alta dimensión (escalable)
+    \item \textbf{SGD:} Cuando hay muchos datos y evaluación es costosa
+    \item \textbf{Log-dominio:} Cuando estabilidad numérica es crítica
+\end{itemize}
+
+\subsection{Impacto del learning rate}
+El parámetro $\alpha$ es crítico en descenso por gradiente. Valores muy pequeños requieren más iteraciones; valores muy grandes causan divergencia. Schedules de decaimiento pueden mejorar la convergencia.
+
+\subsection{Tradeoff velocidad-robustez}
+Newton es el más rápido pero requiere buena condición inicial y capacidad de evaluar derivadas de segundo orden. Bisección es el más lento pero muy robusto. Descenso por gradiente es un punto intermedio útil en altas dimensiones.
+
+\section{Conclusiones}
+\begin{enumerate}
+    \item Los tres métodos fueron implementados correctamente y verificados en múltiples funciones
+    \item Newton es superior en velocidad pero requiere aproximación cuadrática válida
+    \item El descenso por gradiente es más escalable y forma la base de métodos modernos
+    \item SGD, learning rate variable y formulación producto son extensiones prácticas útiles
+    \item El framework simbólico permitió enfoque limpio sin diferenciación numérica
+\end{enumerate}
+
+\section*{Bibliografía}
+\begin{itemize}
+    \item Nocedal, J., \& Wright, S. (2006). Numerical Optimization. Springer.
+    \item Boyd, S., \& Vandenberghe, L. (2004). Convex Optimization. Cambridge University Press.
+    \item Goodfellow, I., Bengio, Y., \& Courville, A. (2016). Deep Learning. MIT Press.
+\end{itemize}
+
+\end{document}
