@@ -71,13 +71,13 @@ $$x_{n+1} = x_n - \frac{f'(x_n)}{f''(x_n)}$$
 Se utilizó un framework simbólico que permite:
 \begin{itemize}
     \item Definir funciones mediante sobrecarga de operadores: $f = x^2 + 2\sin(3x)$
-    \item Calcular derivadas analíticamente: $f' = 2x + 6\cos(3x)$, $f'' = 2 - 18\sin(3x)$
+    \item Calcular derivadas analíticamente: $f' = 2x + 6-\cos(3x)$, $f'' = 2 - 18\sin(3x)$
     \item Evaluar en cualquier punto sin necesidad de derivadas numéricas
 \end{itemize}
 
 \subsection{Estrategia de verificación}
 \begin{enumerate}
-    \item Funciones simples con extremos conocidos: $f(x)=x^2$, $f(x)=(x+1/2)^3-(x+1/2)$, $f(x)=\cos(x)$
+    \item Funciones simples con extremos conocidos: $f(x)=x^2$, $f(x)=(x+1/2)^3-(x+1/2)$, $f(x)=-\cos(x)$
     \item Función computacional: $f(n)=n^2-50n\log_2(n)$ (complejidad de algoritmos)
     \item Datos sintéticos con tres modelos: lineal $y=2x$, exponencial $y=e^{x/4.5}$, seno $y=\sin(1.5x)$
 \end{enumerate}
@@ -93,7 +93,7 @@ Función & $f(x^*)$ & Bisección & Newton & GD \\
 \midrule
 $x^2$ & $0$ en $x=0$ & \checkmark & \checkmark & \checkmark \\
 $(x+1/2)^3-(x+1/2)$ & $0$ en $x=-1/2$ & \checkmark & \checkmark & \checkmark \\
-$\cos(x)$ & $0$ en $x=\pi/2$ & \checkmark & \checkmark & \checkmark \\
+$-\cos(x)$ & $0$ en $x=\pi/2$ & \checkmark & \checkmark & \checkmark \\
 \bottomrule
 \end{tabular}
 \end{center}
