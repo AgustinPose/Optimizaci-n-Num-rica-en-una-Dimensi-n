@@ -213,13 +213,14 @@ El parámetro $\alpha$ es crítico en descenso por gradiente. Valores muy peque�
 Newton es el más rápido pero requiere buena condición inicial y capacidad de evaluar derivadas de segundo orden. Bisección es el más lento pero muy robusto. Descenso por gradiente es un punto intermedio útil en altas dimensiones.
 
 \section{Conclusiones}
-\begin{enumerate}
-    \item Los tres métodos fueron implementados correctamente y verificados en múltiples funciones
-    \item Newton es superior en velocidad pero requiere aproximación cuadrática válida
-    \item El descenso por gradiente es más escalable y forma la base de métodos modernos
-    \item SGD, learning rate variable y formulación producto son extensiones prácticas útiles
-    \item El framework simbólico permitió enfoque limpio sin diferenciación numérica
-\end{enumerate}
+
+En este trabajo se implementaron y analizaron métodos clásicos de optimización numérica en una dimensión: bisección, Newton y descenso por gradiente. A partir de las pruebas realizadas, se pudo comprobar que los tres métodos permiten aproximar puntos críticos o mínimos de una función, aunque su comportamiento depende de las condiciones del problema, del punto inicial y de los parámetros elegidos.
+
+En las funciones simples, los métodos sirvieron para verificar que la implementación era correcta. En particular, el uso de $-\cos(x)$ permitió confirmar que los algoritmos identifican correctamente un mínimo local en $x=0$. Luego, al aplicar los métodos a la función no trivial $f(x)=x^2+2\sin(3x)$, se observó que la presencia de varios extremos locales vuelve más importante la elección del intervalo inicial o del punto de partida. Esto fue especialmente visible en Newton, que puede converger rápidamente si parte de una zona adecuada, pero también puede fallar o no estabilizarse si la condición inicial no es favorable.
+
+El descenso por gradiente mostró ser un método flexible y útil, especialmente en la parte de ajuste de datos, donde se minimizó una función de pérdida para encontrar el mejor parámetro de distintos modelos. Sin embargo, también quedó claro que su desempeño depende del learning rate: valores muy pequeños hacen que el método avance lentamente, mientras que valores demasiado grandes pueden provocar oscilaciones o problemas de convergencia.
+
+Como estudiantes de ingeniería, el trabajo permitió vincular conceptos teóricos de cálculo, como derivadas, puntos críticos y mínimos locales, con herramientas computacionales aplicadas a problemas concretos. La principal conclusión es que no existe un método universalmente mejor: bisección es robusto cuando se cumplen sus condiciones, Newton puede ser muy eficiente pero es más sensible, y descenso por gradiente resulta adaptable aunque requiere una elección cuidadosa de parámetros.
 
 \section*{Bibliografía}
 \begin{itemize}
